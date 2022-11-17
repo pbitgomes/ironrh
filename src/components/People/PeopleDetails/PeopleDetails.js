@@ -1,15 +1,18 @@
 import axios from "axios"
 import { useEffect, useState } from "react"
 import { Button, Card, Col, Container, Row } from "react-bootstrap"
-import { Link, useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAt, faPhone, faCalendarCheck, faCircleCheck, faBuildingUser, faMoneyCheckDollar } from "@fortawesome/free-solid-svg-icons";
+import EditPeople from "../EditPeople/EditPeople";
 
-function PeopleDetails({ apiURL }) {
+function PeopleDetails({ apiURL, form, setForm }) {
     const [employee, setEmployee] = useState({})
     const { id } = useParams()
     const navigate = useNavigate()
 
     useEffect(() => {
-        try{
+        try {
             const fetchEmployee = async () => {
                 const response = await axios.get(`${apiURL}/${id}`)
                 setEmployee(response.data)
@@ -27,32 +30,70 @@ function PeopleDetails({ apiURL }) {
     }
 
     return (
-        <Container>
-            <Card className="text-center">
+        <Container style={{ height: '90vh' }} className="d-flex justify-content-center align-items-center">
+            <Card className="text-center w-100">
                 <Card.Header>
-                    <Card.Title>Nome: { employee.name }</Card.Title>
+                    <Card.Title className="m-0">
+                        <h3>{employee.name}</h3>
+                    </Card.Title>
+                    { employee.active && <h6 className="text-success">Este funcionário está ativo na empresa</h6>}
+                    { !employee.active && <h6 className="text-secondary">Este funcionário não está ativo na empresa</h6> }
                 </Card.Header>
                 <Card.Body>
-                    <Card.Text>E-mail: { employee.email }</Card.Text>
-                    <Card.Text>Telefone: { employee.phone }</Card.Text>
-                    <Card.Text>Departamento: { employee.department }</Card.Text>
-                    <Card.Text>Data de Admissão: { employee.admissionDate }</Card.Text>
-                    <Card.Text>Status: { employee.status }</Card.Text>
-                    <Card.Text>Ativo na empresa: { employee.active }</Card.Text>
+                    <Card.Title>Informações trabalhista</Card.Title>
                     <Row>
                         <Col>
-                            <Button variant="primary">
-                                <Link>Editar funcionário</Link>
-                            </Button>
+                            <Card.Text>
+                                <FontAwesomeIcon icon={faCalendarCheck} /> {employee.admissionDate}
+                            </Card.Text>
+                            <Card.Text>
+                                <FontAwesomeIcon icon={faCircleCheck} /> {employee.status}
+                            </Card.Text>
                         </Col>
                         <Col>
-                            <Button variant="danger" onClick={() => deleteEmployee(employee._id)}>Excluir funcionário</Button>
+                            <Card.Text>
+                                <FontAwesomeIcon icon={faMoneyCheckDollar} /> R${employee.salary},00
+                            </Card.Text>
+                            <Card.Text>
+                                <FontAwesomeIcon icon={faBuildingUser} /> {employee.department}
+                            </Card.Text>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Card.Title>Informações de contato</Card.Title>
+                        <Col>
+                            <Card.Text>
+                                <FontAwesomeIcon icon={faAt} /> {employee.email}
+                            </Card.Text>
+                        </Col>
+                        <Col>
+                            <Card.Text>
+                                <FontAwesomeIcon icon={faPhone} /> {employee.phone}
+                            </Card.Text>
+                        </Col>
+                    </Row>
+                    <Row className="mt-3">
+                        <Col>
+                            <EditPeople id={ id } apiURL={ apiURL} form={ form } setForm={ setForm } />
+                        </Col>
+                        <Col>
+                            <Button
+                                variant="secondary"
+                                onClick={() => navigate(-1)}
+                            >
+                                Voltar</Button>
+                        </Col>
+                        <Col>
+                            <Button
+                                variant="danger"
+                                onClick={() => deleteEmployee(employee._id)}
+                            >
+                                Excluir funcionário</Button>
                         </Col>
                     </Row>
                 </Card.Body>
             </Card>
         </Container>
-
     )
 }
 
